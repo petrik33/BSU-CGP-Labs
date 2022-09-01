@@ -17,7 +17,7 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     colormodel.cpp \
-    colorwindow.cpp \
+    colorwidget.cpp \
     customcolor.cpp \
     enumcolormodel.cpp \
     main.cpp \
@@ -25,7 +25,7 @@ SOURCES += \
 
 HEADERS += \
     colormodel.h \
-    colorwindow.h \
+    colorwidget.h \
     customcolor.h \
     enumcolormodel.h \
     mainwindow.h

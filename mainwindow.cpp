@@ -3,13 +3,15 @@
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
-    , ui(new Ui::MainWindow)
 {
-    ui->setupUi(this);
+    ColorWidget* cWidget = new ColorWidget(this);
+    setCentralWidget(cWidget);
+    int baseSize = 96;
+    resize(baseSize * xDimension,baseSize * yDimension);
 }
 
 MainWindow::~MainWindow()
 {
-    delete ui;
+    //
 }
 

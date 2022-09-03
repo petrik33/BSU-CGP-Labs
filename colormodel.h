@@ -11,6 +11,25 @@ class modelHLS;
 class modelXYZ;
 class modelLAB;
 
+const QVector<QVector<QString>> colorModelsParamNames = {
+    {"R","G","B"},
+    {"C","M","Y","K"},
+    {"H","S","V"},
+    {"H","L","S"},
+    {"X","Y","Z"},
+    {"L","A","B"}
+};
+
+//QString ColorModelName (int id){
+//    QVector<QString> paramNames = colorModelsParamNames[id];
+//    int paramNum = paramNames.length();
+//    QString name;
+//    for(int i = 0; i < paramNum;i++){
+//        name += paramNames[i];
+//    }
+//    return name;
+//}
+
 class colorModel
 {
 public:
@@ -21,6 +40,7 @@ public:
     virtual modelHLS* toHLS() = 0;
     virtual modelXYZ* toXYZ() = 0;
     virtual modelLAB* toLAB() = 0;
+//    virtual QVector<QString> modelParamNames() = 0;
 protected:
 };
 
@@ -39,6 +59,7 @@ public:
     modelHLS* toHLS () override;
     modelXYZ* toXYZ () override;
     modelLAB* toLAB () override;
+//    QVector<QString> modelParamNames() override { return {"R","G","B"};};
 private:
     double R,G,B;
 };
@@ -52,83 +73,89 @@ public:
         K = _K;
     }
     modelRGB* toRGB() override;
-    modelCMYK* toCMYK () override;
+    modelCMYK* toCMYK () override {
+        return this;
+    }
     modelHSV* toHSV () override;
     modelHLS* toHLS () override;
     modelXYZ* toXYZ () override;
     modelLAB* toLAB () override;
+//    QVector<QString> modelParamNames() override { return {"C","M","Y","K"};};
 private:
     double C,M,Y,K;
 };
 
-class modelHSV : public colorModel {
-public:
-    modelHSV(int _H, double _S, double _V) {
-        H = _H;
-        S = _S;
-        V = _V;
-    }
-    modelRGB * toRGB() override;
-    modelCMYK* toCMYK () override;
-    modelHSV* toHSV () override;
-    modelHLS* toHLS () override;
-    modelXYZ* toXYZ () override;
-    modelLAB* toLAB () override;
-private:
-    int H;
-    double S,V;
-};
+//class modelHSV : public colorModel {
+//public:
+//    modelHSV(double _H, double _S, double _V) {
+//        H = _H;
+//        S = _S;
+//        V = _V;
+//    }
+//    modelRGB * toRGB() override;
+//    modelCMYK* toCMYK () override;
+//    modelHSV* toHSV () override;
+//    modelHLS* toHLS () override;
+//    modelXYZ* toXYZ () override;
+//    modelLAB* toLAB () override;
+////    QVector<QString> modelParamNames() override { return {"H","S","V"};};
+//private:
+//    double H,S,V;
+//};
 
-class modelHLS : public colorModel {
-public:
-    modelHLS(double _H,double _L, double _S) {
-        H = _H;
-        L = _L;
-        S = _S;
-    }
-    modelRGB * toRGB() override;
-    modelCMYK* toCMYK () override;
-    modelHSV* toHSV () override;
-    modelHLS* toHLS () override;
-    modelXYZ* toXYZ () override;
-    modelLAB* toLAB () override;
-private:
-    double H,L,S;
-};
+//class modelHLS : public colorModel {
+//public:
+//    modelHLS(double _H,double _L, double _S) {
+//        H = _H;
+//        L = _L;
+//        S = _S;
+//    }
+//    modelRGB * toRGB() override;
+//    modelCMYK* toCMYK () override;
+//    modelHSV* toHSV () override;
+//    modelHLS* toHLS () override;
+//    modelXYZ* toXYZ () override;
+//    modelLAB* toLAB () override;
+////    QVector<QString> modelParamNames() override { return {"H","L","S"};};
+//private:
+//    double H,L,S;
+//};
 
-class modelXYZ : public colorModel {
-public:
-    modelXYZ(double _X, double _Y, double _Z) {
-        X = _X;
-        Y = _Y;
-        Z = _Z;
-    }
-    modelRGB * toRGB() override;
-    modelCMYK* toCMYK () override;
-    modelHSV* toHSV () override;
-    modelHLS* toHLS () override;
-    modelXYZ* toXYZ () override;
-    modelLAB* toLAB () override;
-private:
-    double X,Y,Z;
-};
+//class modelXYZ : public colorModel {
+//public:
+//    modelXYZ(double _X, double _Y, double _Z) {
+//        X = _X;
+//        Y = _Y;
+//        Z = _Z;
+//    }
+//    modelRGB * toRGB() override;
+//    modelCMYK* toCMYK () override;
+//    modelHSV* toHSV () override;
+//    modelHLS* toHLS () override;
+//    modelXYZ* toXYZ () override;
+//    modelLAB* toLAB () override;
+////    QVector<QString> modelParamNames() override { return {"X","Y","Z"};};
+//private:
+//    double X,Y,Z;
+//};
 
-class modelLAB : public colorModel {
-public:
-    modelLAB(double _L, double _A, double _B) {
-        L = _L;
-        A = _A;
-        B = _B;
-    }
-    modelRGB * toRGB() override;
-    modelCMYK* toCMYK () override;
-    modelHSV* toHSV () override;
-    modelHLS* toHLS () override;
-    modelXYZ* toXYZ () override;
-    modelLAB* toLAB () override;
-private:
-    double L,A,B;
-};
+//class modelLAB : public colorModel {
+//public:
+//    modelLAB(double _L, double _A, double _B) {
+//        L = _L;
+//        A = _A;
+//        B = _B;
+//    }
+//    modelRGB * toRGB() override;
+//    modelCMYK* toCMYK () override;
+//    modelHSV* toHSV () override;
+//    modelHLS* toHLS () override;
+//    modelXYZ* toXYZ () override;
+//    modelLAB* toLAB () override;
+////    QVector<QString> modelParamNames() override { return {"L","A","B"};};
+//private:
+//    double L,A,B;
+//};
 
 
 

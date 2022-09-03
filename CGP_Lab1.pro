@@ -17,17 +17,17 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     colormodel.cpp \
+    colorshowwidget.cpp \
     colorwidget.cpp \
     customcolor.cpp \
-    enumcolormodel.cpp \
     main.cpp \
     mainwindow.cpp
 
 HEADERS += \
     colormodel.h \
+    colorshowwidget.h \
     colorwidget.h \
     customcolor.h \
-    enumcolormodel.h \
     mainwindow.h
 
 FORMS += \

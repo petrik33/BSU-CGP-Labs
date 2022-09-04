@@ -20,6 +20,7 @@ SOURCES += \
     colorshowwidget.cpp \
     colorwidget.cpp \
     customcolor.cpp \
+    customcolorpalette.cpp \
     main.cpp \
     mainwindow.cpp
 
@@ -28,6 +29,7 @@ HEADERS += \
     colorshowwidget.h \
     colorwidget.h \
     customcolor.h \
+    customcolorpalette.h \
     mainwindow.h
 
 FORMS += \

@@ -6,16 +6,16 @@ ColorWidget::ColorWidget(QWidget *parent) : QWidget(parent)
     setLayout(mainLayout);
 
     cShow = new ColorShowWidget(this);
-    mainLayout->addWidget(cShow,cShowX,cShowY,cShowRowSpan,cShowColSpan);
-    //Remove
-    cShow->setColor(QColor(0,0,0));
-    cShow->update();
+    mainLayout->addWidget(cShow,cShowY,cShowX,cShowRowSpan,cShowColSpan);
+
+    cPalette = new CustomColorPalette(4,8);
+    mainLayout->addWidget(cPalette,paletteY,paletteX,paletteRowSpan,paletteColSpan);
 
     for(int i = 0; i < int(MODELS_NUMBER); i++){
-        QString modelName = "ColorModelName(i);";
+        QString modelName = colorModel::ColorModelName(i);
         QPushButton* modelButton = new QPushButton(modelName);
         int row = buttonsY + i / buttonsInRow;
-        int col = buttonsX + ((i+1) % buttonsInRow) * buttonsColSpan;
+        int col = buttonsX + (i % buttonsInRow) * buttonsColSpan;
         cSpaceButtons.push_back(modelButton);
         mainLayout->addWidget(modelButton,row,col,buttonsRowSpan,buttonsColSpan);
         //To Do: Connect

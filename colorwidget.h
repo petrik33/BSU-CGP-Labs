@@ -17,6 +17,7 @@
 #include <colorshowwidget.h>
 #include <colormodel.h>
 #include <enumcolormodel.h>
+#include <customcolorpalette.h>
 
 class ColorWidget : public QWidget
 {
@@ -38,6 +39,7 @@ public slots:
 protected:
    QGridLayout* mainLayout = nullptr;
    ColorShowWidget* cShow = nullptr;
+   CustomColorPalette* cPalette = nullptr;
    QVector<QPushButton*> cSpaceButtons;
    QVector<QLabel*> cLabels;
    QVector<QSlider*> cSliders;
@@ -51,6 +53,11 @@ const int cShowX = 0;
 const int cShowY = 0;
 const int cShowColSpan = 8;
 const int cShowRowSpan = 4;
+
+const int paletteX = 8;
+const int paletteY = 0;
+const int paletteColSpan = 4;
+const int paletteRowSpan = 4;
 
 const int buttonsX = cShowX;
 const int buttonsY = cShowY + cShowRowSpan;

@@ -20,16 +20,6 @@ const QVector<QVector<QString>> colorModelsParamNames = {
     {"L","A","B"}
 };
 
-//QString ColorModelName (int id){
-//    QVector<QString> paramNames = colorModelsParamNames[id];
-//    int paramNum = paramNames.length();
-//    QString name;
-//    for(int i = 0; i < paramNum;i++){
-//        name += paramNames[i];
-//    }
-//    return name;
-//}
-
 class colorModel
 {
 public:
@@ -40,6 +30,7 @@ public:
     virtual modelHLS* toHLS() = 0;
     virtual modelXYZ* toXYZ() = 0;
     virtual modelLAB* toLAB() = 0;
+    static QString ColorModelName (int id);
 //    virtual QVector<QString> modelParamNames() = 0;
 protected:
 };

@@ -5,6 +5,17 @@ colorModel::colorModel()
     //
 }
 
+QString colorModel::ColorModelName(int id)
+{
+    QVector<QString> paramNames = colorModelsParamNames[id];
+    int paramNum = paramNames.length();
+    QString name;
+    for(int i = 0; i < paramNum;i++){
+        name += paramNames[i];
+    }
+    return name;
+}
+
 modelCMYK *modelRGB::toCMYK()
 {
     double K = qMin(qMin(1 - R, 1 - G), 1 - B);

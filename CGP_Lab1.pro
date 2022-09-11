@@ -17,20 +17,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
     colormodel.cpp \
+    colormodelbutton.cpp \
     colorshowwidget.cpp \
     colorwidget.cpp \
     customcolor.cpp \
     customcolorpalette.cpp \
     main.cpp \
-    mainwindow.cpp
+    mainwindow.cpp \
+    palettebutton.cpp
 
 HEADERS += \
     colormodel.h \
+    colormodelbutton.h \
     colorshowwidget.h \
     colorwidget.h \
     customcolor.h \
     customcolorpalette.h \
-    mainwindow.h
+    mainwindow.h \
+    palettebutton.h
 
 FORMS += \
     mainwindow.ui

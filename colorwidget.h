@@ -18,29 +18,20 @@
 #include <colormodel.h>
 #include <enumcolormodel.h>
 #include <customcolorpalette.h>
+#include <colormodelbutton.h>
 
 class ColorWidget : public QWidget
 {
     Q_OBJECT
 public:
    ColorWidget(QWidget *parent = nullptr);
-   enum ColorModel {
-       RGB = 0,
-       CMYK,
-       HSV,
-       HLS,
-       XYZ,
-       LAB,
-       MODELS_NUMBER
-   };
-   Q_ENUM(ColorModel);
 public slots:
-   void setColorModel(ColorModel modelID);
+   void setColorModel(COLOR_MODEL modelID);
 protected:
    QGridLayout* mainLayout = nullptr;
    ColorShowWidget* cShow = nullptr;
    CustomColorPalette* cPalette = nullptr;
-   QVector<QPushButton*> cSpaceButtons;
+   QVector<ColorModelButton*> cSpaceButtons;
    QVector<QLabel*> cLabels;
    QVector<QSlider*> cSliders;
    QVector<QSpinBox*> cSpins;
@@ -66,7 +57,7 @@ const int buttonsRowSpan = 1;
 const int buttonsColSpan = 4;
 
 const int labelsX = 0;
-const int labelsY = buttonsY+buttonsRowSpan*(int(ColorWidget::MODELS_NUMBER) / buttonsInRow);
+const int labelsY = buttonsY+buttonsRowSpan*(int(COLOR_MODEL::MODELS_NUMBER) / buttonsInRow);
 const int labelsColSpan = 2;
 const int labelsRowSpan = 1;
 

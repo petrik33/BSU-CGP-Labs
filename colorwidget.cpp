@@ -11,42 +11,61 @@ ColorWidget::ColorWidget(QWidget *parent) : QWidget(parent)
     cPalette = new CustomColorPalette(4,8);
     mainLayout->addWidget(cPalette,paletteY,paletteX,paletteRowSpan,paletteColSpan);
 
-    for(int i = 0; i < int(MODELS_NUMBER); i++){
+    for(int i = 0; i < int(COLOR_MODEL::MODELS_NUMBER); i++){
         QString modelName = colorModel::ColorModelName(i);
-        QPushButton* modelButton = new QPushButton(modelName);
+        ColorModelButton* modelButton = new ColorModelButton(modelName,COLOR_MODEL(i));
         int row = buttonsY + i / buttonsInRow;
         int col = buttonsX + (i % buttonsInRow) * buttonsColSpan;
         cSpaceButtons.push_back(modelButton);
         mainLayout->addWidget(modelButton,row,col,buttonsRowSpan,buttonsColSpan);
-        //To Do: Connect
+        modelButton->connect(modelButton,SIGNAL(modelPicked(COLOR_MODEL, bool)),this,SLOT(setColorModel(COLOR_MODEL)));
+    }
+
+    for(int i = 0; i < colorModelsMaxParams; i++) {
+        cLabels.push_back(nullptr);
+        cSliders.push_back(nullptr);
+        cSpins.push_back(nullptr);
     }
 
     setColorModel(RGB);
-
 }
 
-void ColorWidget::setColorModel(ColorModel modelID)
+void ColorWidget::setColorModel(COLOR_MODEL modelID)
 {
-    cLabels.clear();
-    cSliders.clear();
-    cSpins.clear();
+    for(int i = 0; i < colorModelsMaxParams; i++) {
+        if(cLabels[i]) {
+            delete cLabels[i];
+            cLabels[i] = nullptr;
+        }
+        if(cSliders[i]) {
+            delete cSliders[i];
+            cSliders[i] = nullptr;
+        }
+        if(cSpins[i]) {
+            delete cSpins[i];
+            cSpins[i] = nullptr;
+        }
+    }
 
     QVector<QString> modelParamNames = colorModelsParamNames[int(modelID)];
     int paramsNum = modelParamNames.length();
     for(int i = 0; i < paramsNum; i++){
        QLabel* label = new QLabel(modelParamNames[i]);
-       cLabels.push_back(label);
+       cLabels[i] = label;
        mainLayout->addWidget(label,labelsY+i,labelsX,labelsRowSpan,labelsColSpan);
 
        QSlider* slider = new QSlider(Qt::Horizontal);
-       cSliders.push_back(slider);
+       slider->setRange(colorModelsParamRange[modelID][i][0],colorModelsParamRange[modelID][i][1]);
+       cSliders[i] = slider;
        mainLayout->addWidget(slider,slidersY+i,slidersX,slidersRowSpan,slidersColSpan);
-       //To Do: Set Range, Connect
 
        QSpinBox* spin = new QSpinBox();
-       cSpins.push_back(spin);
+       spin->setRange(colorModelsParamRange[modelID][i][0],colorModelsParamRange[modelID][i][1]);
+       cSpins[i] = spin;
        mainLayout->addWidget(spin,spinsY+i,spinsX,spinsRowSpan,spinsColSpan);
-       //To Do: Set Range, Connect
+
+       connect(slider,SIGNAL(sliderMoved(int)),spin,SLOT(setValue(int)));
+       connect(spin,SIGNAL(valueChanged(int)),slider,SLOT(setValue(int)));
     }
 
     //To Do: Set Values

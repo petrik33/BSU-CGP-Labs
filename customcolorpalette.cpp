@@ -32,12 +32,17 @@ bool CustomColorPalette::updateColors()
     return true;
 }
 
+void CustomColorPalette::colorPressed(QColor color)
+{
+    QMessageBox::information(this,"Color Changed","New Color: " + color.name());
+}
+
 QPushButton *CustomColorPalette::paletteButtonCreate(QColor color)
 {
-    QPushButton* button = new QPushButton(this);
+    QPushButton* button = new PaletteButton(color,this);
     //To Do: Rework Into Special Button Class
-    button->setStyleSheet("background-color: " + color.name());
     button->setSizePolicy(QSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding));
+    connect(button,SIGNAL(colorClicked(QColor)),this,SLOT(colorPressed(QColor)));
     return button;
 }
 

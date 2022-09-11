@@ -13,6 +13,10 @@
 #include <QVector>
 #include <QColor>
 
+#include <QMessageBox>
+
+#include "palettebutton.h"
+
 class CustomColorPalette : public QWidget
 {
     Q_OBJECT
@@ -41,6 +45,7 @@ public slots:
     };
 protected slots:
     bool updateColors();
+    void colorPressed(QColor color);
 protected:
     QPushButton* paletteButtonCreate(QColor color);
     QRandomGenerator random;

@@ -16,8 +16,19 @@ QString colorModel::ColorModelName(int id)
     return name;
 }
 
+void colorModel::setParams(double *newParams)
+{
+    for(int i = 0; i < colorModelsMaxParams; i++) {
+        params[i] = newParams[i];
+    }
+}
+
 modelCMYK *modelRGB::toCMYK()
 {
+    double R = params[0];
+    double G = params[1];
+    double B = params[2];
+
     double K = qMin(qMin(1 - R, 1 - G), 1 - B);
     double kReverse = 1 - K;
     if(kReverse == 0) return new modelCMYK(); // Only Happens with Black Color (Default)
@@ -25,16 +36,23 @@ modelCMYK *modelRGB::toCMYK()
     double M = (1 - G - K)/kReverse;
     double Y = (1 - B - K)/kReverse;
     modelCMYK* color = new modelCMYK(C,M,Y,K);
+
     return color;
 }
 
 modelHSV *modelRGB::toHSV()
 {
+    double R = params[0];
+    double G = params[1];
+    double B = params[2];
+
     double maxChannel = qMax(qMax(R,G),B);
     double minChannel = qMin(qMin(R,G),B);
     double V = maxChannel;
+
     double S = 1 - minChannel/maxChannel;
     double H = 0;
+
     double angleACOS = acos((R - 0.5 * G - 0.5 * B) / sqrt(R*R + G*G + B*B - R*G - R*B - G*B));
     if(G >= B)
     {
@@ -44,177 +62,184 @@ modelHSV *modelRGB::toHSV()
     {
         H = (1 - angleACOS) / M_PI_2;
     }
+
     return new modelHSV(H,S,V);
 }
 
 modelHLS *modelRGB::toHLS()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelHLS();
 }
 
 modelXYZ *modelRGB::toXYZ()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelXYZ();
 }
 
 modelLAB *modelRGB::toLAB()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelLAB();
 }
 
 modelRGB *modelCMYK::toRGB()
 {
+    double C = params[0];
+    double M = params[1];
+    double Y = params[2];
+    double K = params[3];
+
     double kReverse = 1 - K;
     double R = (1 - C)/kReverse;
     double G = (1 - M)/kReverse;
     double B = (1 - Y)/kReverse;
+
     return new modelRGB(R,G,B);
 }
 
 modelHSV *modelCMYK::toHSV()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelHSV();
 }
 
 modelHLS *modelCMYK::toHLS()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelHLS();
 }
 
 modelXYZ *modelCMYK::toXYZ()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelXYZ();
 }
 
 modelLAB *modelCMYK::toLAB()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelLAB();
 }
 
 modelRGB* modelHSV::toRGB()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelRGB();
 }
 
 modelCMYK* modelHSV::toCMYK()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelCMYK();
 }
 
 modelHLS *modelHSV::toHLS()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelHLS();
 }
 
 modelXYZ *modelHSV::toXYZ()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelXYZ();
 }
 
 modelLAB *modelHSV::toLAB()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelLAB();
 }
 
 modelRGB* modelHLS::toRGB()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelRGB();
 }
 
 modelCMYK* modelHLS::toCMYK()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelCMYK();
 }
 
 modelHSV *modelHLS::toHSV()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelHSV();
 }
 
 modelXYZ *modelHLS::toXYZ()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelXYZ();
 }
 
 modelLAB *modelHLS::toLAB()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelLAB();
 }
 
 modelRGB* modelXYZ::toRGB()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelRGB();
 }
 
 modelCMYK* modelXYZ::toCMYK()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelCMYK();
 }
 
 modelHSV *modelXYZ::toHSV()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelHSV();
 }
 
 modelHLS *modelXYZ::toHLS()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelHLS();
 }
 
 modelLAB *modelXYZ::toLAB()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelLAB();
 }
 
 modelRGB* modelLAB::toRGB()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelRGB();
 }
 
 modelCMYK* modelLAB::toCMYK()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelCMYK();
 }
 
 modelHSV *modelLAB::toHSV()
 {
-    // To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelHSV();
 }
 
 modelHLS *modelLAB::toHLS()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelHLS();
 }
 
 modelXYZ *modelLAB::toXYZ()
 {
-    //To do
+    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelXYZ();
 }
 

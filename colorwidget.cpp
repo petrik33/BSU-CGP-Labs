@@ -68,8 +68,14 @@ void ColorWidget::setColorModel(COLOR_MODEL modelID)
        connect(slider,SIGNAL(sliderMoved(int)),spin,SLOT(setValue(int)));
        connect(spin,SIGNAL(valueChanged(int)),slider,SLOT(setValue(int)));
     }
-    if(colorModelInst) delete colorModelInst;
-    colorModelInst = new
+    if(colorModelInst) {
+        colorModel* newModel = convertColorModel(colorModelInst,modelID);
+        delete colorModelInst;
+        colorModelInst = newModel;
+    }
+    else {
+        colorModelInst = makeColorModel(modelID);
+    }
     //To Do: Set Values
 }
 

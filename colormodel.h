@@ -56,7 +56,12 @@ public:
     virtual modelXYZ* toXYZ() = 0;
     virtual modelLAB* toLAB() = 0;
     static QString ColorModelName(int id);
+    static colorModel* makeColorModel(COLOR_MODEL modelID);
+    colorModel* convertColorModel(COLOR_MODEL modelID);
 //    virtual QVector<QString> modelParamNames() = 0;
+    double* getParams() {
+        return params;
+    }
 public slots:
     void setParams(double* newParams);
 protected:
@@ -208,60 +213,6 @@ public:
 //    QVector<QString> modelParamNames() override { return {"L","A","B"};};
 //    double L,A,B;
 };
-
-colorModel* makeColorModel(COLOR_MODEL id) {
-    switch (id) {
-    case COLOR_MODEL::RGB:
-        return new modelRGB();
-        break;
-    case COLOR_MODEL::CMYK:
-        return new modelCMYK();
-        break;
-    case COLOR_MODEL::HLS:
-        return new modelHLS();
-        break;
-    case COLOR_MODEL::HSV:
-        return new modelHSV();
-        break;
-    case COLOR_MODEL::XYZ:
-        return new modelXYZ();
-        break;
-    case COLOR_MODEL::LAB:
-        return new modelLAB();
-        break;
-    default:
-        return nullptr;
-        break;
-    }
-}
-
-colorModel* convertColorModel(colorModel* oldModel, COLOR_MODEL id) {
-    if(oldModel == nullptr) return nullptr;
-    switch (id) {
-    case COLOR_MODEL::RGB:
-        return oldModel->toRGB();
-        break;
-    case COLOR_MODEL::CMYK:
-        return oldModel->toCMYK();
-        break;
-    case COLOR_MODEL::HLS:
-        return oldModel->toHLS();
-        break;
-    case COLOR_MODEL::HSV:
-        return oldModel->toHSV();
-        break;
-    case COLOR_MODEL::XYZ:
-        return oldModel->toXYZ();
-        break;
-    case COLOR_MODEL::LAB:
-        return oldModel->toLAB();
-        break;
-    default:
-        return nullptr;
-        break;
-    }
-}
-
 
 
 #endif // COLORMODEL_H

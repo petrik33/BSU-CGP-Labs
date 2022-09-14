@@ -109,7 +109,6 @@ protected:
         QColor("gold"),
         QColor("goldenrod"),
         QColor("gray"),
-        QColor("grey"),
         QColor("green"),
         QColor("greenyellow"),
         QColor("honeydew"),

@@ -28,6 +28,9 @@ public:
 public slots:
    void setColorModel(COLOR_MODEL modelID);
    void changeColor(QColor);
+   void colorModelUpdateSliders();
+   void colorModelUpdateSpins();
+   void colorModelUpdatePalette();
 protected:
    QGridLayout* mainLayout = nullptr;
    ColorShowWidget* cShow = nullptr;
@@ -37,6 +40,12 @@ protected:
    QVector<QSlider*> cSliders;
    QVector<QSpinBox*> cSpins;
    colorModel* colorModelInst = nullptr;
+   COLOR_MODEL colorModelENUM = COLOR_MODEL::RGB;
+   int getParamsNum () const {
+       int paramsNum = 3;
+       if(colorModelENUM == COLOR_MODEL::CMYK) paramsNum = 4;
+       return paramsNum;
+   }
 };
 
 const int xDimension = 12;

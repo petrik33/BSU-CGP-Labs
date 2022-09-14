@@ -59,29 +59,85 @@ void ColorWidget::setColorModel(COLOR_MODEL modelID)
        slider->setRange(colorModelsParamRange[modelID][i][0],colorModelsParamRange[modelID][i][1]);
        cSliders[i] = slider;
        mainLayout->addWidget(slider,slidersY+i,slidersX,slidersRowSpan,slidersColSpan);
+       connect(slider,SIGNAL(sliderMoved(int)),this,SLOT(colorModelUpdateSliders()));
 
        QSpinBox* spin = new QSpinBox();
        spin->setRange(colorModelsParamRange[modelID][i][0],colorModelsParamRange[modelID][i][1]);
        cSpins[i] = spin;
        mainLayout->addWidget(spin,spinsY+i,spinsX,spinsRowSpan,spinsColSpan);
+       connect(spin,SIGNAL(valueChanged(int)),this,SLOT(colorModelUpdateSpins()));
 
        connect(slider,SIGNAL(sliderMoved(int)),spin,SLOT(setValue(int)));
        connect(spin,SIGNAL(valueChanged(int)),slider,SLOT(setValue(int)));
     }
+
     if(colorModelInst) {
-        colorModel* newModel = convertColorModel(colorModelInst,modelID);
+        colorModel* newModel = colorModelInst->convertColorModel(modelID);
         delete colorModelInst;
         colorModelInst = newModel;
     }
     else {
-        colorModelInst = makeColorModel(modelID);
+        colorModelInst = colorModel::makeColorModel(modelID);
     }
+
+    colorModelENUM = modelID;
     //To Do: Set Values
 }
 
 void ColorWidget::changeColor(QColor color)
 {
     cShow->setColor(color);
+}
+
+
+
+void ColorWidget::colorModelUpdateSliders()
+{
+    int paramsNum = getParamsNum();
+    double newParams[paramsNum];
+    for(int i = 0; i < paramsNum; i++) {
+        QSlider* slider = cSliders[i];
+        double value = slider->value();
+        double min = slider->minimum();
+        double max = slider->maximum();
+        double range = max - min;
+        double normalizedValue = (value - min) / range;
+        newParams[i] = normalizedValue;
+    }
+    colorModelInst->setParams(newParams);
+    double* NRGBParams = colorModelInst->toRGB()->getParams();
+    int intRGBParams[3];
+    for(int i = 0; i < 3; i++) {
+        intRGBParams[i] = int(NRGBParams[i] * 255);
+    }
+    cShow->setColor(QColor(intRGBParams[0],intRGBParams[1],intRGBParams[2]));
+}
+
+void ColorWidget::colorModelUpdateSpins()
+{
+    int paramsNum = getParamsNum();
+    double newParams[paramsNum];
+    for(int i = 0; i < paramsNum; i++) {
+        QSpinBox* spin = cSpins[i];
+        double value = spin->value();
+        double min = spin->minimum();
+        double max = spin->maximum();
+        double range = max - min;
+        double normalizedValue = (value - min) / range;
+        newParams[i] = normalizedValue;
+    }
+    colorModelInst->setParams(newParams);
+    double* NRGBParams = colorModelInst->toRGB()->getParams();
+    int intRGBParams[3];
+    for(int i = 0; i < 3; i++) {
+        intRGBParams[i] = int(NRGBParams[i] * 255);
+    }
+    cShow->setColor(QColor(intRGBParams[0],intRGBParams[1],intRGBParams[2]));
+}
+
+void ColorWidget::colorModelUpdatePalette()
+{
+
 }
 
 

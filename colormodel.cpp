@@ -16,6 +16,58 @@ QString colorModel::ColorModelName(int id)
     return name;
 }
 
+colorModel* colorModel::makeColorModel(COLOR_MODEL id) {
+    switch (id) {
+    case COLOR_MODEL::RGB:
+        return new modelRGB();
+        break;
+    case COLOR_MODEL::CMYK:
+        return new modelCMYK();
+        break;
+    case COLOR_MODEL::HLS:
+        return new modelHLS();
+        break;
+    case COLOR_MODEL::HSV:
+        return new modelHSV();
+        break;
+    case COLOR_MODEL::XYZ:
+        return new modelXYZ();
+        break;
+    case COLOR_MODEL::LAB:
+        return new modelLAB();
+        break;
+    default:
+        return nullptr;
+        break;
+    }
+}
+
+colorModel* colorModel::convertColorModel(COLOR_MODEL id) {
+    switch (id) {
+    case COLOR_MODEL::RGB:
+        return toRGB();
+        break;
+    case COLOR_MODEL::CMYK:
+        return toCMYK();
+        break;
+    case COLOR_MODEL::HLS:
+        return toHLS();
+        break;
+    case COLOR_MODEL::HSV:
+        return toHSV();
+        break;
+    case COLOR_MODEL::XYZ:
+        return toXYZ();
+        break;
+    case COLOR_MODEL::LAB:
+        return toLAB();
+        break;
+    default:
+        return nullptr;
+        break;
+    }
+}
+
 void colorModel::setParams(double *newParams)
 {
     for(int i = 0; i < colorModelsMaxParams; i++) {

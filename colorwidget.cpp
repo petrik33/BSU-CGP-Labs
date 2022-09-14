@@ -10,6 +10,7 @@ ColorWidget::ColorWidget(QWidget *parent) : QWidget(parent)
 
     cPalette = new CustomColorPalette(4,8);
     mainLayout->addWidget(cPalette,paletteY,paletteX,paletteRowSpan,paletteColSpan);
+    connect(cPalette,SIGNAL(colorPicked(QColor)),this,SLOT(changeColor(QColor)));
 
     for(int i = 0; i < int(COLOR_MODEL::MODELS_NUMBER); i++){
         QString modelName = colorModel::ColorModelName(i);
@@ -67,8 +68,14 @@ void ColorWidget::setColorModel(COLOR_MODEL modelID)
        connect(slider,SIGNAL(sliderMoved(int)),spin,SLOT(setValue(int)));
        connect(spin,SIGNAL(valueChanged(int)),slider,SLOT(setValue(int)));
     }
-
+    if(colorModelInst) delete colorModelInst;
+    colorModelInst = new
     //To Do: Set Values
+}
+
+void ColorWidget::changeColor(QColor color)
+{
+    cShow->setColor(color);
 }
 
 

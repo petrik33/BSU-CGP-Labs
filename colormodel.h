@@ -51,7 +51,6 @@ public:
     virtual modelHLS* toHLS() = 0;
     virtual modelXYZ* toXYZ() = 0;
     virtual modelLAB* toLAB() = 0;
-    static QString ColorModelName (int id);
 //    virtual QVector<QString> modelParamNames() = 0;
 protected:
 };
@@ -77,7 +76,6 @@ public:
     modelXYZ* toXYZ () override;
     modelLAB* toLAB () override;
 //    QVector<QString> modelParamNames() override { return {"R","G","B"};};
-private:
     double R,G,B;
 };
 
@@ -104,7 +102,6 @@ public:
     modelXYZ* toXYZ () override;
     modelLAB* toLAB () override;
 //    QVector<QString> modelParamNames() override { return {"C","M","Y","K"};};
-private:
     double C,M,Y,K;
 };
 
@@ -129,7 +126,6 @@ public:
     modelXYZ* toXYZ () override;
     modelLAB* toLAB () override;
 //    QVector<QString> modelParamNames() override { return {"H","S","V"};};
-private:
     double H,S,V;
 };
 
@@ -154,7 +150,6 @@ public:
     modelXYZ* toXYZ () override;
     modelLAB* toLAB () override;
 //    QVector<QString> modelParamNames() override { return {"H","L","S"};};
-private:
     double H,L,S;
 };
 
@@ -179,7 +174,6 @@ public:
     };
     modelLAB* toLAB () override;
 //    QVector<QString> modelParamNames() override { return {"X","Y","Z"};};
-private:
     double X,Y,Z;
 };
 
@@ -204,9 +198,29 @@ public:
         return this;
     };
 //    QVector<QString> modelParamNames() override { return {"L","A","B"};};
-private:
     double L,A,B;
 };
+
+colorModel* makeColorModel(COLOR_MODEL id) {
+    switch (id) {
+    case COLOR_MODEL::RGB:
+        break;
+    case COLOR_MODEL::CMYK:
+        break;
+    case COLOR_MODEL::HLS:
+        return new modelHLS();
+        break;
+    case COLOR_MODEL::HSV:
+        return new modelHSV();
+        break;
+    case COLOR_MODEL::XYZ:
+        return new modelXYZ();
+        break;
+    case COLOR_MODEL::LAB:
+        return new modelLAB();
+        break;
+    }
+}
 
 
 

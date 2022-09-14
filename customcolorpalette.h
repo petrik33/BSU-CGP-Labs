@@ -24,7 +24,7 @@ public:
     explicit CustomColorPalette(int w, int h,QWidget *parent = nullptr);
 
 signals:
-    //To Do: Add Signal For Button Pressed
+    void colorPicked(QColor color);
 public slots:
     bool setPaletteWidth(int w) {
         if(w * paletteH > maxColors) return false;

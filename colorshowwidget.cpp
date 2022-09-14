@@ -8,6 +8,7 @@ ColorShowWidget::ColorShowWidget(QWidget *parent) : QWidget(parent)
 void ColorShowWidget::setColor(QColor color)
 {
     currentColor = color;
+    update();
 }
 
 void ColorShowWidget::paintEvent(QPaintEvent *event)

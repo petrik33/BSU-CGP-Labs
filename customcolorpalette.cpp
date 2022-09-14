@@ -34,7 +34,7 @@ bool CustomColorPalette::updateColors()
 
 void CustomColorPalette::colorPressed(QColor color)
 {
-    QMessageBox::information(this,"Color Changed","New Color: " + color.name());
+    emit colorPicked(color);
 }
 
 QPushButton *CustomColorPalette::paletteButtonCreate(QColor color)

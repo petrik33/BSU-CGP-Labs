@@ -27,6 +27,7 @@ public:
    ColorWidget(QWidget *parent = nullptr);
 public slots:
    void setColorModel(COLOR_MODEL modelID);
+   void changeColor(QColor);
 protected:
    QGridLayout* mainLayout = nullptr;
    ColorShowWidget* cShow = nullptr;
@@ -35,6 +36,7 @@ protected:
    QVector<QLabel*> cLabels;
    QVector<QSlider*> cSliders;
    QVector<QSpinBox*> cSpins;
+   colorModel* colorModelInst = nullptr;
 };
 
 const int xDimension = 12;

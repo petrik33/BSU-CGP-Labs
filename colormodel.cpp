@@ -8,6 +8,7 @@ colorModel::colorModel()
 colorModel::colorModel(QVector<double> Params)
 {
     params = Params;
+    if(params.size() < colorModelsMaxParams) params.push_back(0);
 }
 
 colorModel::~colorModel()
@@ -103,13 +104,11 @@ QVector<double> modelRGB::rgbToHueMaxMin(QVector<double> params) {
     double g = params[1];
     double b = params[2];
 
-    auto maxIt = std::max_element(params.begin(),params.end());
-    int maxIndex = maxIt - params.begin();
+    auto result = std::minmax_element(params.begin(),params.end()-1);
+    int maxIndex = result.second - params.begin();
 
-    auto minIt = std::min_element(params.begin(),params.end());
-
-    double max = *maxIt;
-    double min = *minIt;
+    double min = *result.first;
+    double max = *result.second;
 
     double c = max - min;
 
@@ -210,7 +209,9 @@ modelHSV *modelRGB::toHSV()
     double maxChannel = hueMaxMin[1];
     double minChannel = hueMaxMin[2];
 
-    double S = 1 - minChannel/maxChannel;
+    double remainder = (maxChannel == 0) ? 0 : minChannel / maxChannel;
+
+    double S = 1 - remainder;
     double V = maxChannel;
 
     return new modelHSV(H,S,V);
@@ -228,7 +229,8 @@ modelHLS *modelRGB::toHLS()
     double delta = maxChannel - minChannel;
 
     double L = (maxChannel + minChannel) / 2;
-    double S = delta / (1 - abs(2*L - 1));
+    double divider = (1 - abs(2*L - 1));
+    double S = (divider == 0) ? 0 : delta / divider;
 
     return new modelHLS(H,L,S);
 }
@@ -291,13 +293,13 @@ modelRGB* modelHSV::toRGB()
     double V = params[2];
 
     double C = V * S;
-    double X = C * (1 - abs(fmod(H*6,2) - 1));
+    double X = C * (1 - abs(fmod(H*6,2.0) - 1));
 
     QVector<double> rgbParams = modelRGB::rgbFromCXH(C,X,H);
 
     double m = V - C;
 
-    std::for_each(rgbParams.begin(), rgbParams.end(), [&m] (double x) {x += m;});
+    std::for_each(rgbParams.begin(), rgbParams.end(), [&m] (double& x) {x += m;});
 
     return new modelRGB(rgbParams);
 }
@@ -339,7 +341,7 @@ modelRGB* modelHLS::toRGB()
 
     double m = L - C / 2;
 
-    std::for_each(rgbParams.begin(), rgbParams.end(), [&m] (double x) {x += m;});
+    std::for_each(rgbParams.begin(), rgbParams.end(), [&m] (double& x) {x += m;});
 
     return new modelRGB(rgbParams);
 }

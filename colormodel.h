@@ -6,6 +6,7 @@
 #include <QMessageBox>
 #include <QObject>
 #include <cmath>
+#include <QColor>
 
 class modelRGB;
 class modelCMYK;
@@ -86,9 +87,14 @@ public:
         params[2] = 0;
     }
     modelRGB(QVector<double> Params) : colorModel(Params) {};
+    modelRGB(QColor color) : colorModel() {
+        params[0] = double(color.red()) / 255;
+        params[1] = double(color.green()) / 255;
+        params[2] = double(color.blue()) / 255;
+    }
 
     modelRGB* toRGB() override {
-        return this;
+        return new modelRGB(params);
     }
 
     modelCMYK* toCMYK () override;
@@ -121,7 +127,7 @@ public:
 
     modelRGB* toRGB() override;
     modelCMYK* toCMYK () override {
-        return this;
+        return new modelCMYK(params);
     }
     modelHSV* toHSV () override;
     modelHLS* toHLS () override;
@@ -148,7 +154,7 @@ public:
     modelRGB * toRGB() override;
     modelCMYK* toCMYK () override;
     modelHSV* toHSV () override {
-        return this;
+        return new modelHSV(params);
     };
     modelHLS* toHLS () override;
     modelXYZ* toXYZ () override;
@@ -175,7 +181,7 @@ public:
     modelCMYK* toCMYK () override;
     modelHSV* toHSV () override;
     modelHLS* toHLS () override {
-        return this;
+        return new modelHLS(params);
     };
     modelXYZ* toXYZ () override;
     modelLAB* toLAB () override;
@@ -202,7 +208,7 @@ public:
     modelHSV* toHSV () override;
     modelHLS* toHLS () override;
     modelXYZ* toXYZ () override {
-        return this;
+        return new modelXYZ(params);
     };
     modelLAB* toLAB () override;
 //    QVector<QString> modelParamNames() override { return {"X","Y","Z"};};
@@ -229,7 +235,7 @@ public:
     modelHLS* toHLS () override;
     modelXYZ* toXYZ () override;
     modelLAB* toLAB () override {
-        return this;
+        return new modelLAB(params);
     };
 //    QVector<QString> modelParamNames() override { return {"L","A","B"};};
 //    double L,A,B;

@@ -150,11 +150,10 @@ void ColorWidget::spinsSlidersSet()
 
 void ColorWidget::colorModelUpdatePalette(QColor color)
 {
-    double red = double(color.red()) / 255;
-    double green = double(color.green()) / 255;
-    double blue = double(color.blue()) / 255;
-    modelRGB* rgbRep = new modelRGB(red,green,blue);
-    ColorModelSet(rgbRep->convertColorModel(colorModelENUM)->getParams());
+    modelRGB* rgbRep = new modelRGB(color);
+    colorModel* currentModel = rgbRep->convertColorModel(colorModelENUM);
+    colorModelInst->setParams(currentModel->getParams());
+    changeColor(color);
     spinsSlidersSet();
 }
 

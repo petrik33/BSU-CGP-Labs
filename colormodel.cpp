@@ -2,7 +2,17 @@
 
 colorModel::colorModel()
 {
-    //
+    params.fill(0,colorModelsMaxParams);
+}
+
+colorModel::colorModel(QVector<double> Params)
+{
+    params = Params;
+}
+
+colorModel::~colorModel()
+{
+
 }
 
 QString colorModel::ColorModelName(int id)
@@ -68,11 +78,107 @@ colorModel* colorModel::convertColorModel(COLOR_MODEL id) {
     }
 }
 
-void colorModel::setParams(double *newParams)
+QVector<double>colorModel::getParams()
 {
-    for(int i = 0; i < colorModelsMaxParams; i++) {
+    return params;
+}
+
+QColor colorModel::getQColor()
+{
+    modelRGB* rgb = toRGB();
+    QVector<double> params = rgb->getParams();
+    return QColor(params[0]*255,params[1]*255,params[2]*255);
+}
+
+void colorModel::setParams(QVector<double> newParams)
+{
+    int paramsNum = newParams.size();
+    for(int i = 0; i < paramsNum; i++) {
         params[i] = newParams[i];
     }
+}
+
+QVector<double> modelRGB::rgbToHueMaxMin(QVector<double> params) {
+    double r = params[0];
+    double g = params[1];
+    double b = params[2];
+
+    auto maxIt = std::max_element(params.begin(),params.end());
+    int maxIndex = maxIt - params.begin();
+
+    auto minIt = std::min_element(params.begin(),params.end());
+
+    double max = *maxIt;
+    double min = *minIt;
+
+    double c = max - min;
+
+    double hue = 0;
+    double segment;
+    double shift;
+
+    if (c > 0) {
+        switch(maxIndex) {
+          case 0:
+            segment = (g - b) / c;
+            shift   = 0 / 60;       // R° / (360° / hex sides)
+            if (segment < 0) {          // hue > 180, full rotation
+              shift = 360 / 60;         // R° / (360° / hex sides)
+            }
+            break;
+          case 1:
+            segment = (b - r) / c;
+            shift   = 120 / 60;     // G° / (360° / hex sides)
+            break;
+          case 2:
+            segment = (r - g) / c;
+            shift   = 240 / 60;     // B° / (360° / hex sides)
+            break;
+        }
+        hue = segment + shift;
+    }
+
+    QVector<double> hueMaxMin = {hue / 6, max, min};
+    return hueMaxMin; // hue is in [0,6], normalize it
+}
+
+QVector<double> modelRGB::rgbFromCXH(double C, double X, double H)
+{
+    QVector<double> rgb;
+    QVector<double> cxo = {C, X, 0};
+    switch (int(floor(H * 6))) {
+    case 0:
+        //remain default: cxo
+        break;
+    case 1:
+        //xco
+        cxo.swapItemsAt(0,1);
+        break;
+    case 2:
+        //ocx
+        cxo.swapItemsAt(0,1);
+        cxo.swapItemsAt(0,2);
+        break;
+    case 3:
+        //oxc
+        cxo.swapItemsAt(0,2);
+        break;
+    case 4:
+        //xoc
+        cxo.swapItemsAt(0,2);
+        cxo.swapItemsAt(0,1);
+        break;
+    case 5:
+    case 6:
+        //cox
+        cxo.swapItemsAt(1,2);
+        break;
+
+    }
+    for(int i = 0; i < 3; i++) {
+        rgb.push_back(cxo[i]);
+    }
+    return rgb;
 }
 
 modelCMYK *modelRGB::toCMYK()
@@ -83,10 +189,13 @@ modelCMYK *modelRGB::toCMYK()
 
     double K = qMin(qMin(1 - R, 1 - G), 1 - B);
     double kReverse = 1 - K;
+
     if(kReverse == 0) return new modelCMYK(); // Only Happens with Black Color (Default)
+
     double C = (1 - R - K)/kReverse;
     double M = (1 - G - K)/kReverse;
     double Y = (1 - B - K)/kReverse;
+
     modelCMYK* color = new modelCMYK(C,M,Y,K);
 
     return color;
@@ -94,34 +203,34 @@ modelCMYK *modelRGB::toCMYK()
 
 modelHSV *modelRGB::toHSV()
 {
-    double R = params[0];
-    double G = params[1];
-    double B = params[2];
+    QVector<double> hueMaxMin = modelRGB::rgbToHueMaxMin(params);
 
-    double maxChannel = qMax(qMax(R,G),B);
-    double minChannel = qMin(qMin(R,G),B);
-    double V = maxChannel;
+    double H = hueMaxMin[0];
+
+    double maxChannel = hueMaxMin[1];
+    double minChannel = hueMaxMin[2];
 
     double S = 1 - minChannel/maxChannel;
-    double H = 0;
-
-    double angleACOS = acos((R - 0.5 * G - 0.5 * B) / sqrt(R*R + G*G + B*B - R*G - R*B - G*B));
-    if(G >= B)
-    {
-        H = angleACOS / M_PI_2;
-    }
-    else
-    {
-        H = (1 - angleACOS) / M_PI_2;
-    }
+    double V = maxChannel;
 
     return new modelHSV(H,S,V);
 }
 
 modelHLS *modelRGB::toHLS()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelHLS();
+    QVector<double> hueMaxMin = modelRGB::rgbToHueMaxMin(params);
+
+    double H = hueMaxMin[0];
+
+    double maxChannel = hueMaxMin[1];
+    double minChannel = hueMaxMin[2];
+
+    double delta = maxChannel - minChannel;
+
+    double L = (maxChannel + minChannel) / 2;
+    double S = delta / (1 - abs(2*L - 1));
+
+    return new modelHLS(H,L,S);
 }
 
 modelXYZ *modelRGB::toXYZ()
@@ -144,9 +253,9 @@ modelRGB *modelCMYK::toRGB()
     double K = params[3];
 
     double kReverse = 1 - K;
-    double R = (1 - C)/kReverse;
-    double G = (1 - M)/kReverse;
-    double B = (1 - Y)/kReverse;
+    double R = (1 - C)*kReverse;
+    double G = (1 - M)*kReverse;
+    double B = (1 - Y)*kReverse;
 
     return new modelRGB(R,G,B);
 }
@@ -177,8 +286,20 @@ modelLAB *modelCMYK::toLAB()
 
 modelRGB* modelHSV::toRGB()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelRGB();
+    double H = params[0];
+    double S = params[1];
+    double V = params[2];
+
+    double C = V * S;
+    double X = C * (1 - abs(fmod(H*6,2) - 1));
+
+    QVector<double> rgbParams = modelRGB::rgbFromCXH(C,X,H);
+
+    double m = V - C;
+
+    std::for_each(rgbParams.begin(), rgbParams.end(), [&m] (double x) {x += m;});
+
+    return new modelRGB(rgbParams);
 }
 
 modelCMYK* modelHSV::toCMYK()
@@ -207,8 +328,20 @@ modelLAB *modelHSV::toLAB()
 
 modelRGB* modelHLS::toRGB()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelRGB();
+    double H = params[0];
+    double L = params[1];
+    double S = params[2];
+
+    double C = (1 - abs(2*L - 1)) * S;
+    double X = C * (1 - abs(fmod(H*6,2) - 1));
+
+    QVector<double> rgbParams = modelRGB::rgbFromCXH(C,X,H);
+
+    double m = L - C / 2;
+
+    std::for_each(rgbParams.begin(), rgbParams.end(), [&m] (double x) {x += m;});
+
+    return new modelRGB(rgbParams);
 }
 
 modelCMYK* modelHLS::toCMYK()

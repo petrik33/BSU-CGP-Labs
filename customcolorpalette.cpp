@@ -35,6 +35,9 @@ bool CustomColorPalette::updateColors()
 void CustomColorPalette::colorPressed(QColor color)
 {
     emit colorPicked(color);
+    emit redPicked(color.red());
+    emit greenPicked(color.green());
+    emit bluePicked(color.blue());
 }
 
 QPushButton *CustomColorPalette::paletteButtonCreate(QColor color)

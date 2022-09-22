@@ -25,6 +25,9 @@ public:
 
 signals:
     void colorPicked(QColor color);
+    void redPicked(int);
+    void greenPicked(int);
+    void bluePicked(int);
 public slots:
     bool setPaletteWidth(int w) {
         if(w * paletteH > maxColors) return false;

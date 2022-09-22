@@ -5,6 +5,7 @@
 #include <QtMath>
 #include <QMessageBox>
 #include <QObject>
+#include <cmath>
 
 class modelRGB;
 class modelCMYK;
@@ -48,64 +49,76 @@ class colorModel : public QObject
     Q_OBJECT
 public:
     colorModel();
-    virtual ~colorModel() {};
+    colorModel(QVector<double> Params);
+    virtual ~colorModel();
+
     virtual modelRGB* toRGB() = 0;
     virtual modelCMYK* toCMYK() = 0;
     virtual modelHSV* toHSV() = 0;
     virtual modelHLS* toHLS() = 0;
     virtual modelXYZ* toXYZ() = 0;
     virtual modelLAB* toLAB() = 0;
+
     static QString ColorModelName(int id);
     static colorModel* makeColorModel(COLOR_MODEL modelID);
     colorModel* convertColorModel(COLOR_MODEL modelID);
+
 //    virtual QVector<QString> modelParamNames() = 0;
-    double* getParams() {
-        return params;
-    }
+
+    QVector<double> getParams();
+    QColor getQColor();
 public slots:
-    void setParams(double* newParams);
+    void setParams(QVector<double> newParams);
 protected:
-    double params[4];
+    QVector<double> params;
 };
 
 class modelRGB : public colorModel {
 public:
-    modelRGB(double _R,double _G,double _B) {
+    modelRGB(double _R,double _G,double _B) : colorModel() {
         params[0] = _R;
         params[1] = _G;
         params[2] = _B;
     }
-    modelRGB() {
+    modelRGB() : colorModel() {
         params[0] = 0;
         params[1] = 0;
         params[2] = 0;
     }
+    modelRGB(QVector<double> Params) : colorModel(Params) {};
+
     modelRGB* toRGB() override {
         return this;
     }
+
     modelCMYK* toCMYK () override;
     modelHSV* toHSV () override;
     modelHLS* toHLS () override;
     modelXYZ* toXYZ () override;
     modelLAB* toLAB () override;
+
+    static QVector<double> rgbToHueMaxMin(QVector<double> params);
+    static QVector<double> rgbFromCXH(double C, double X, double H);
 //    QVector<QString> modelParamNames() override { return {"R","G","B"};};
 //    double R,G,B;
 };
 
 class modelCMYK : public colorModel {
 public:
-    modelCMYK(double _C,double _M, double _Y,double _K) {
+    modelCMYK(double _C,double _M, double _Y,double _K) : colorModel() {
         params[0] = _C;
         params[1] = _M;
         params[2] = _Y;
         params[3] = _K;
     }
-    modelCMYK() {
-        params[0] = 0;
-        params[1] = 0;
-        params[2] = 0;
+    modelCMYK() : colorModel() {
+        params[0] = 1;
+        params[1] = 1;
+        params[2] = 1;
         params[3] = 1;
     }
+    modelCMYK(QVector<double> Params) : colorModel(Params) {};
+
     modelRGB* toRGB() override;
     modelCMYK* toCMYK () override {
         return this;
@@ -120,16 +133,18 @@ public:
 
 class modelHSV : public colorModel {
 public:
-    modelHSV(double _H, double _S, double _V) {
+    modelHSV(double _H, double _S, double _V) : colorModel() {
         params[0] = _H;
         params[1] = _S;
         params[2] = _V;
     }
-    modelHSV() {
+    modelHSV() : colorModel() {
         params[0] = 0;
         params[1] = 0;
         params[2] = 0;
     }
+    modelHSV(QVector<double> Params) : colorModel(Params) {};
+
     modelRGB * toRGB() override;
     modelCMYK* toCMYK () override;
     modelHSV* toHSV () override {
@@ -144,16 +159,18 @@ public:
 
 class modelHLS : public colorModel {
 public:
-    modelHLS(double _H,double _L, double _S) {
+    modelHLS(double _H,double _L, double _S) : colorModel() {
         params[0] = _H;
         params[1] = _L;
         params[2] = _S;
     };
-    modelHLS() {
+    modelHLS() : colorModel() {
         params[0] = 0;
         params[1] = 0;
         params[2] = 0;
     };
+    modelHLS(QVector<double> Params) : colorModel(Params) {};
+
     modelRGB * toRGB() override;
     modelCMYK* toCMYK () override;
     modelHSV* toHSV () override;
@@ -168,16 +185,18 @@ public:
 
 class modelXYZ : public colorModel {
 public:
-    modelXYZ(double _X, double _Y, double _Z) {
+    modelXYZ(double _X, double _Y, double _Z) : colorModel() {
         params[0] = _X;
         params[1] = _Y;
         params[2] = _Z;
     }
-    modelXYZ() {
+    modelXYZ() : colorModel() {
         params[0] = 0;
         params[1] = 0;
         params[2] = 0;
     };
+    modelXYZ(QVector<double> Params) : colorModel(Params) {};
+
     modelRGB * toRGB() override;
     modelCMYK* toCMYK () override;
     modelHSV* toHSV () override;
@@ -192,16 +211,18 @@ public:
 
 class modelLAB : public colorModel {
 public:
-    modelLAB(double _L, double _A, double _B) {
+    modelLAB(double _L, double _A, double _B) : colorModel() {
         params[0] = _L;
         params[1] = _A;
         params[2] = _B;
     };
-    modelLAB() {
+    modelLAB() : colorModel() {
         params[0] = 0;
         params[1] = 0;
         params[2] = 0;
     };
+    modelLAB(QVector<double> Params) : colorModel(Params) {};
+
     modelRGB * toRGB() override;
     modelCMYK* toCMYK () override;
     modelHSV* toHSV () override;

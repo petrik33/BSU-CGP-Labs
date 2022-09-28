@@ -7,6 +7,7 @@
 #include <QObject>
 #include <cmath>
 #include <QColor>
+#include <QGenericMatrix>
 
 class modelRGB;
 class modelCMYK;
@@ -62,12 +63,16 @@ public:
 
     static QString ColorModelName(int id);
     static colorModel* makeColorModel(COLOR_MODEL modelID);
+    static double paramNormalize(double value, COLOR_MODEL modelID, int paramID);
+    static double paramEvaluate(double value, COLOR_MODEL modelID, int paramID);
     colorModel* convertColorModel(COLOR_MODEL modelID);
 
 //    virtual QVector<QString> modelParamNames() = 0;
 
     QVector<double> getParams();
     QColor getQColor();
+signals:
+    void inaccurateConversion(bool on);
 public slots:
     void setParams(QVector<double> newParams);
 protected:
@@ -202,6 +207,8 @@ public:
         params[2] = 0;
     };
     modelXYZ(QVector<double> Params) : colorModel(Params) {};
+
+    static double Fx(double x);
 
     modelRGB * toRGB() override;
     modelCMYK* toCMYK () override;

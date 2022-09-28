@@ -80,6 +80,9 @@ void ColorWidget::setColorModel(COLOR_MODEL modelID)
         colorModelInst = colorModel::makeColorModel(modelID);
     }
 
+    cShow->setInaccurate(false);
+    connect(colorModelInst,SIGNAL(inaccurateConversion(bool)),cShow,SLOT(setInaccurate(bool)));
+
     colorModelENUM = modelID;
     //To Do: Set Values
     spinsSlidersSet();
@@ -156,6 +159,11 @@ void ColorWidget::colorModelUpdatePalette(QColor color)
     changeColor(color);
     spinsSlidersSet();
 }
+
+//void ColorWidget::onConversion(bool inaccurate)
+//{
+
+//}
 
 
 

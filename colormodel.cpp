@@ -1,4 +1,7 @@
 #include "colormodel.h"
+#include <QDebug>
+
+//Color Model General
 
 colorModel::colorModel()
 {
@@ -53,6 +56,22 @@ colorModel* colorModel::makeColorModel(COLOR_MODEL id) {
     }
 }
 
+double colorModel::paramNormalize(double value, COLOR_MODEL modelID, int paramID)
+{
+    double lRange = colorModelsParamRange[int(modelID)][paramID][0];
+    double rRange = colorModelsParamRange[int(modelID)][paramID][1];
+    double normalizedValue = (value - lRange) / (rRange - lRange);
+    return normalizedValue;
+}
+
+double colorModel::paramEvaluate(double value, COLOR_MODEL modelID, int paramID)
+{
+    double lRange = colorModelsParamRange[int(modelID)][paramID][0];
+    double rRange = colorModelsParamRange[int(modelID)][paramID][1];
+    double evaluatedValue = lRange + value * (rRange - lRange);
+    return evaluatedValue;
+}
+
 colorModel* colorModel::convertColorModel(COLOR_MODEL id) {
     switch (id) {
     case COLOR_MODEL::RGB:
@@ -98,6 +117,8 @@ void colorModel::setParams(QVector<double> newParams)
         params[i] = newParams[i];
     }
 }
+
+//RGB
 
 QVector<double> modelRGB::rgbToHueMaxMin(QVector<double> params) {
     double r = params[0];
@@ -237,15 +258,44 @@ modelHLS *modelRGB::toHLS()
 
 modelXYZ *modelRGB::toXYZ()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelXYZ();
+    QVector<double> paramsCopy = params;
+
+    auto func = [](double &x){
+        if(x >= 0.04045) {
+            x = pow((x+0.055) / (1.055),2.4);
+            return;
+        }
+        x /= 12.92;
+    };
+    std::for_each(paramsCopy.begin(),paramsCopy.end()-1,func);
+
+    QGenericMatrix<1, 3, double> rgbMatrix;
+    for(int i = 0; i < 3; i++) {
+        rgbMatrix(i,0) = paramsCopy[i];
+    }
+
+    double conversionNumbers[] = {
+        0.4124564,  0.3575761,  0.1804375,
+        0.2126729,  0.7151522,  0.0721750,
+        0.0193339,  0.1191920,  0.9503041
+    };
+
+    QGenericMatrix<3,3, double> cMatrix(conversionNumbers);
+    QGenericMatrix<1, 3, double> xyzMatrix = cMatrix * rgbMatrix;
+    double x = xyzMatrix(0,0);
+    double y = xyzMatrix(1,0);
+    double z = xyzMatrix(2,0);
+
+    return new modelXYZ(x,y,z);
 }
 
 modelLAB *modelRGB::toLAB()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelLAB();
+    modelXYZ* transit = toXYZ();
+    return transit->toLAB();
 }
+
+//CMYK
 
 modelRGB *modelCMYK::toRGB()
 {
@@ -264,27 +314,28 @@ modelRGB *modelCMYK::toRGB()
 
 modelHSV *modelCMYK::toHSV()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelHSV();
+    modelRGB* subModel = toRGB();
+    return subModel->toHSV();
 }
 
 modelHLS *modelCMYK::toHLS()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelHLS();
+    modelRGB* subModel = toRGB();
+    return subModel->toHLS();
 }
 
 modelXYZ *modelCMYK::toXYZ()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelXYZ();
+    modelRGB* subModel = toRGB();
+    return subModel->toXYZ();
 }
 
 modelLAB *modelCMYK::toLAB()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelLAB();
+    return toRGB()->toLAB();
 }
+
+//HSV
 
 modelRGB* modelHSV::toRGB()
 {
@@ -306,20 +357,26 @@ modelRGB* modelHSV::toRGB()
 
 modelCMYK* modelHSV::toCMYK()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelCMYK();
+    modelRGB* subModel = toRGB();
+    return subModel->toCMYK();
 }
 
 modelHLS *modelHSV::toHLS()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelHLS();
+    double H = params[0];
+    double Sv = params[1];
+    double V = params[2];
+
+    double L = V * (1 - Sv/2);
+    double Sl = (L == 1 || L == 0) ? 0 : (V - L) / qMin(L, 1 - L);
+
+    return new modelHLS(H,L,Sl);
 }
 
 modelXYZ *modelHSV::toXYZ()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelXYZ();
+    modelRGB* transit = toRGB();
+    return transit->toXYZ();
 }
 
 modelLAB *modelHSV::toLAB()
@@ -327,6 +384,8 @@ modelLAB *modelHSV::toLAB()
     QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
     return new modelLAB();
 }
+
+//HLS
 
 modelRGB* modelHLS::toRGB()
 {
@@ -348,20 +407,25 @@ modelRGB* modelHLS::toRGB()
 
 modelCMYK* modelHLS::toCMYK()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelCMYK();
+    modelRGB* subModel = toRGB();
+    return subModel->toCMYK();
 }
 
 modelHSV *modelHLS::toHSV()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelHSV();
+    double H = params[0];
+    double L = params[1];
+    double Sl = params[2];
+
+    double V = L + Sl * qMin(L,1-L);
+    double Sv = (V == 0) ? 0 : 2 * (1 - L / V);
+    return new modelHSV(H,Sv,V);
 }
 
 modelXYZ *modelHLS::toXYZ()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelXYZ();
+    modelRGB* transit = toRGB();
+    return transit->toXYZ();
 }
 
 modelLAB *modelHLS::toLAB()
@@ -370,63 +434,148 @@ modelLAB *modelHLS::toLAB()
     return new modelLAB();
 }
 
+//XYZ
+
 modelRGB* modelXYZ::toRGB()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelRGB();
+    QVector<double> paramsCopy = params;
+
+    QGenericMatrix<1, 3, double> xyzMatrix;
+    for(int i = 0; i < 3; i++) {
+        xyzMatrix(i,0) = paramsCopy[i];
+    }
+
+    double conversionNumbers[] = {
+        3.2404542, -1.5371385, -0.4985314,
+       -0.9692660,  1.8760108,  0.0415560,
+        0.0556434, -0.2040259,  1.0572252,
+    };
+
+    QGenericMatrix<3, 3, double> cMatrix(conversionNumbers);
+    QGenericMatrix<1, 3, double> rgbMatrix = cMatrix * xyzMatrix;
+
+    bool inaccurate = false;
+
+    QVector<double> rgbParams(colorModelsMaxParams,0);
+    for(int i = 0; i < 3; i++) {
+        double param = rgbMatrix(i,0);
+        if(param < 0) {
+            param = 0;
+            inaccurate = true;
+        }
+        if(param > 1) {
+            param = 1;
+            inaccurate = true;
+        }
+        rgbParams[i] = param;
+    }
+
+    auto func = [](double &x){
+        if(x >= 0.031308) {
+            x = (1.055 * pow(x,1/2.4) - 0.055);
+            return;
+        }
+        x *= 12.92;
+    };
+
+    emit inaccurateConversion(inaccurate);
+
+    std::for_each(rgbParams.begin(),rgbParams.end()-1,func);
+
+    return new modelRGB(rgbParams);
 }
 
 modelCMYK* modelXYZ::toCMYK()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelCMYK();
+    modelRGB* transit = toRGB();
+    return transit->toCMYK();
 }
 
 modelHSV *modelXYZ::toHSV()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelHSV();
+    modelRGB* transit = toRGB();
+    return transit->toHSV();
 }
 
 modelHLS *modelXYZ::toHLS()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelHLS();
+    modelRGB* transit = toRGB();
+    return transit->toHLS();
 }
 
 modelLAB *modelXYZ::toLAB()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelLAB();
+    QVector<double> paramsCopy = params;
+
+    auto func = [](double &x){
+        if(x >= 0.008856) {
+            x = pow(x,1.0/3.0);
+            return;
+        }
+        x = x * 7.787 + 16.0/116.0;
+    };
+
+    std::for_each(paramsCopy.begin(), paramsCopy.end() - 1, func);
+
+    double x = paramsCopy[0];
+    double y = paramsCopy[1];
+    double z = paramsCopy[2];
+
+    double L = paramNormalize(116.0 * y - 16.0, COLOR_MODEL::LAB, 0);
+    double a = paramNormalize(500.0 * (x - y), COLOR_MODEL::LAB, 1);
+    double b = paramNormalize(200.0 * (y - z), COLOR_MODEL::LAB, 2);
+
+//    double whitePoint[] = {
+//        95.047, 100, 108.883,
+//    };
+    return new modelLAB(L, a, b);
 }
+
+//LAB
 
 modelRGB* modelLAB::toRGB()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelRGB();
+    modelXYZ* transit = toXYZ();
+    return transit->toRGB();
 }
 
 modelCMYK* modelLAB::toCMYK()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelCMYK();
+    return toRGB()->toCMYK();
 }
 
 modelHSV *modelLAB::toHSV()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelHSV();
+    return toRGB()->toHSV();
 }
 
 modelHLS *modelLAB::toHLS()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelHLS();
+    return toRGB()->toHLS();
 }
 
 modelXYZ *modelLAB::toXYZ()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelXYZ();
+    double L = params[0];
+    double a = params[1];
+    double b = params[2];
+
+    auto func = [](double &x){
+        if(x*x*x >= 0.008856) {
+            x = pow(x,3);
+            return;
+        }
+        x = (x - double(16/116)) * 7.787;
+    };
+
+    QVector<double> xyzParams(colorModelsMaxParams,0);
+    L = paramEvaluate(L, COLOR_MODEL::LAB, 0);
+    a = paramEvaluate(a, COLOR_MODEL::LAB, 1);
+    b = paramEvaluate(b, COLOR_MODEL::LAB, 2);
+    xyzParams[0] = (L + 16) / 116;
+    xyzParams[1] = (a/500 + (L+16)/116);
+    xyzParams[2] = (L+16) / 116 - b/200;
+    std::for_each(xyzParams.begin(), xyzParams.end() - 1, func);
+    return new modelXYZ(xyzParams);
 }
 

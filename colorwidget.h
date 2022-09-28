@@ -33,6 +33,7 @@ public slots:
    void ColorModelSet(QVector<double> params);
    void spinsSlidersSet();
    void colorModelUpdatePalette(QColor color);
+//   void onConversion(bool inaccurate);
 protected:
    QGridLayout* mainLayout = nullptr;
    ColorShowWidget* cShow = nullptr;

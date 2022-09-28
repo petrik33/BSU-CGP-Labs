@@ -11,9 +11,12 @@ public:
     ColorShowWidget(QWidget *parent = nullptr);
 public slots:
    void setColor(QColor color);
+   void setInaccurate(bool on);
 protected:
     void paintEvent(QPaintEvent *event) override;
     QColor currentColor;
+    bool inaccurate;
+    const QString text = "APPROXIMATED";
 };
 
 #endif // COLORSHOWWIDGET_H

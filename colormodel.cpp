@@ -344,7 +344,7 @@ modelRGB* modelHSV::toRGB()
     double V = params[2];
 
     double C = V * S;
-    double X = C * (1 - abs(fmod(H*6,2.0) - 1));
+    double X = C * (1 - abs(fmod(H*6.0,2.0) - 1));
 
     QVector<double> rgbParams = modelRGB::rgbFromCXH(C,X,H);
 
@@ -381,8 +381,7 @@ modelXYZ *modelHSV::toXYZ()
 
 modelLAB *modelHSV::toLAB()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelLAB();
+    return toXYZ()->toLAB();
 }
 
 //HLS
@@ -430,8 +429,7 @@ modelXYZ *modelHLS::toXYZ()
 
 modelLAB *modelHLS::toLAB()
 {
-    QMessageBox::information(nullptr,"To Do","Sorry, this type of convertion isn't supported yet"); //To do
-    return new modelLAB();
+    return toXYZ()->toLAB();
 }
 
 //XYZ
@@ -472,7 +470,7 @@ modelRGB* modelXYZ::toRGB()
 
     auto func = [](double &x){
         if(x >= 0.031308) {
-            x = (1.055 * pow(x,1/2.4) - 0.055);
+            x = (1.055 * pow(x,1.0/2.4) - 0.055);
             return;
         }
         x *= 12.92;
@@ -512,7 +510,7 @@ modelLAB *modelXYZ::toLAB()
             x = pow(x,1.0/3.0);
             return;
         }
-        x = x * 7.787 + 16.0/116.0;
+        x = (x * 903.3 + 16.0) / 116.0;
     };
 
     std::for_each(paramsCopy.begin(), paramsCopy.end() - 1, func);
@@ -556,26 +554,34 @@ modelHLS *modelLAB::toHLS()
 
 modelXYZ *modelLAB::toXYZ()
 {
-    double L = params[0];
-    double a = params[1];
-    double b = params[2];
+    QVector<double> paramsCopy = params;
+    double L = paramsCopy[0];
+    double a = paramsCopy[1];
+    double b = paramsCopy[2];
+
+    QVector<double> xyzParams(colorModelsMaxParams,0);
+
+    L = paramEvaluate(L, COLOR_MODEL::LAB, 0);
+    a = paramEvaluate(a, COLOR_MODEL::LAB, 1);
+    b = paramEvaluate(b, COLOR_MODEL::LAB, 2);
+
+    double y = (L + 16.0) / 116.0;
+    double x = (a/500.0 + y);
+    double z = y - b/200.0;
+    xyzParams[0] = x;
+    xyzParams[1] = y;
+    xyzParams[2] = z;
 
     auto func = [](double &x){
         if(x*x*x >= 0.008856) {
             x = pow(x,3);
             return;
         }
-        x = (x - double(16/116)) * 7.787;
+        x = (x - 16.0/116.0) * 7.787;
     };
 
-    QVector<double> xyzParams(colorModelsMaxParams,0);
-    L = paramEvaluate(L, COLOR_MODEL::LAB, 0);
-    a = paramEvaluate(a, COLOR_MODEL::LAB, 1);
-    b = paramEvaluate(b, COLOR_MODEL::LAB, 2);
-    xyzParams[0] = (L + 16) / 116;
-    xyzParams[1] = (a/500 + (L+16)/116);
-    xyzParams[2] = (L+16) / 116 - b/200;
     std::for_each(xyzParams.begin(), xyzParams.end() - 1, func);
+
     return new modelXYZ(xyzParams);
 }
 

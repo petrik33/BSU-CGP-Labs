@@ -35,6 +35,8 @@ public slots:
    void colorModelUpdatePalette(QColor color);
 //   void onConversion(bool inaccurate);
 protected:
+   bool slidersSetInner;
+   bool spinsSetInner;
    QGridLayout* mainLayout = nullptr;
    ColorShowWidget* cShow = nullptr;
    CustomColorPalette* cPalette = nullptr;

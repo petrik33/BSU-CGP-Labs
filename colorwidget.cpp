@@ -28,6 +28,9 @@ ColorWidget::ColorWidget(QWidget *parent) : QWidget(parent)
         cSpins.push_back(nullptr);
     }
 
+    spinsSetInner = false;
+    slidersSetInner = false;
+
     setColorModel(RGB);
 }
 
@@ -67,8 +70,8 @@ void ColorWidget::setColorModel(COLOR_MODEL modelID)
        mainLayout->addWidget(spin,spinsY+i,spinsX,spinsRowSpan,spinsColSpan);
        connect(spin,SIGNAL(valueChanged(int)),this,SLOT(colorModelUpdateSpins()));
 
-       connect(slider,SIGNAL(sliderMoved(int)),spin,SLOT(setValue(int)));
-       connect(spin,SIGNAL(valueChanged(int)),slider,SLOT(setValue(int)));
+//       connect(slider,SIGNAL(sliderMoved(int)),spin,SLOT(setValue(int)));
+//       connect(spin,SIGNAL(valueChanged(int)),slider,SLOT(setValue(int)));
     }
 
     if(colorModelInst) {
@@ -97,11 +100,18 @@ void ColorWidget::changeColor(QColor color)
 
 void ColorWidget::colorModelUpdateSliders()
 {
+    if(slidersSetInner) {
+        slidersSetInner = false;
+        return;
+    }
     int paramsNum = getParamsNum();
     QVector<double> newParams;
     for(int i = 0; i < paramsNum; i++) {
         QSlider* slider = cSliders[i];
+        QSpinBox* spin = cSpins[i];
         double value = slider->value();
+        spinsSetInner = true;
+        spin->setValue(value);
         double min = slider->minimum();
         double max = slider->maximum();
         double range = max - min;
@@ -113,11 +123,18 @@ void ColorWidget::colorModelUpdateSliders()
 
 void ColorWidget::colorModelUpdateSpins()
 {
+    if(spinsSetInner) {
+        spinsSetInner = false;
+        return;
+    }
     int paramsNum = getParamsNum();
     QVector<double> newParams;
     for(int i = 0; i < paramsNum; i++) {
         QSpinBox* spin = cSpins[i];
+        QSlider* slider = cSliders[i];
         double value = spin->value();
+        slidersSetInner = true;
+        slider->setValue(value);
         double min = spin->minimum();
         double max = spin->maximum();
         double range = max - min;
@@ -146,6 +163,8 @@ void ColorWidget::spinsSlidersSet()
         double range = max - min;
         double normalizedValue = params[i];
         double value = min + normalizedValue * range;
+        spinsSetInner = true;
+        slidersSetInner = true;
         slider->setValue(value);
         spin->setValue(value);
     }

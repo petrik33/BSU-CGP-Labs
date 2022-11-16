@@ -59,6 +59,7 @@
     * Image Processing Toolbox 
 
 Платформа: Windows
+
 Разрешение: 1600 x 900
 
 ## Вывод

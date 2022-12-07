@@ -617,8 +617,6 @@ void letter::drawFigure(){
   }
   glEnableClientState(GL_VERTEX_ARRAY);
   glVertexPointer(3, GL_FLOAT, 0, c);
-//  glDrawArrays(GL_QUADS, 0, vertices);
-//  glVertexPointer(3, GL_FLOAT, 0, c);
   glDrawElements(GL_QUADS, indexPoints, GL_UNSIGNED_BYTE, IndexArray);
   glDisableClientState(GL_VERTEX_ARRAY);
 }

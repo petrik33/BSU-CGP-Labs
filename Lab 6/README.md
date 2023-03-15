@@ -29,7 +29,9 @@ OpenGL. Построив массив вершин трехмерной моде
     - Задание переноса трехмерного объекта в LineEdits: "x transfer", "y transfer", "z transfer".
     - Отображение полученного объекта после переноса с помощью кнопки "transfer".
     - Задание вращения вокруг произвольной оси в LineEdits: "rotation x", "rotation y", "rotation z".
-    - Отображение полученного объекта после вращения с помощью кнопок: "rotation x", "rotation y", "rotation z".
+    - Отображение полученного объекта после вращения с помощью кнопок: "rotation x", "rotation y", "rotation z".\
+    
+![Letter T on a 3D grid](Screenshot.png)
 
 ## Технические Параметры
 
